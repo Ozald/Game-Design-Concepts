@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Composition vs Inheritance</title>
+</head>
+
+<body>
+    <h1>Composition vs Inheritance</h1>
+    <p>
+        Throughout my time in studying for my major, inheritance is commonly taught as a way to 
+        introduce runtime polymorphism which, in layman's terms, is changing what a function does 
+        depending on who calls it. This typically follows a parent-child approach. For example, we 
+        have a parent class called Enemy, and each Enemy subclass (Zombie, Skeleton, etc.) has a 
+        few functions such as Attack(), TakeDamage(), and Move().
+    </p>
+    <p>
+        These seem straightforward enough and, at first, you might think this is the way to go. In
+        fact, I've made this exact mistake in the past. However, let's take a step back and think 
+        about what we are doing when we use inheritance.
+    </p>
+
+    <h2>The Problem With Inheritance</h2>
+    <p>
+        What happens if we have a hundred different types of enemies, and some of them have exceptions 
+        to these rules? Maybe some enemies are invincible and can't take damage. Maybe some of them 
+        don't attack or even move, and are much more stationary with contact damage. How will we 
+        handle exceptions to the rules that we established? <b>This is the pitfall of inheritance; 
+        you are signing a contract that forces every single child class to follow the same principles.</b>
+    </p>
+
+    <h2>Composition as an Alternative</h2>
+    <p>
+        So what makes composition so special? Well, what if instead of having multiple classes and 
+        subclasses to handle variations of an enemy, we create separate objects such as MoveSystem, 
+        AttackSystem, and HPSystem. That way, we can pick and choose whether an enemy includes these 
+        systems, removing the contract that inheritance forces upon it, embracing potential changes 
+        in the future.
+    </p>
+    <p>
+
+    </p>
+    <h2>In A Practical Scenario</h2>
+
+    <p>
+        WIP
+    </p>
+
+    <h2>Conclusion</h2>
+    <p>
+        Does this mean inheritance is completely useless? No, of course not! Sometimes, you want that 
+        contract to be made for polymorphism to be used. Polymorphism is very useful when you want one 
+        line of code to work for several different types of objects, like one Drive() function call that 
+        works for all types of Car types. However, whenever you use inheritance, keep in mind the contract 
+        you are making. Like all things, use your knowledge with purpose.
+    </p>
+</body>
+
+</html>
