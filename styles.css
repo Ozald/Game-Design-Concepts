@@ -1,0 +1,33 @@
+h1 {
+    text-align: center;
+    color: black;
+    font-size: 2.7em;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgb(196, 196, 196);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: url('GPU_BG.jpg');
+    background-size: cover;
+    background-blend-mode: multiply;
+    background-attachment: fixed;
+    line-height: 1.5;
+}
+
+.note {
+    background-color: #e8e8e8;
+    border-left: 6px solid #2196F3;
+    padding: 20px;
+    margin: 20px 0;
+    font-style: italic;
+    box-shadow: 6px 6px 3px 2px rgba(0, 0, 0, 0.136);
+}
+
+.page {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 10px 30px 20px 30px;
+    background-color: white;
+}
