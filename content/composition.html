@@ -12,24 +12,149 @@
         <h1>Composition vs Inheritance</h1>
         <p>
             Throughout my time in studying for my major, inheritance is commonly taught as a way to 
-            introduce runtime polymorphism which, in layman's terms, is changing what a function does 
-            depending on who calls it. This typically follows a parent-child approach. For example, we 
-            have a parent class called Enemy, and each Enemy subclass (Zombie, Skeleton, etc.) has a 
-            few functions such as Attack(), TakeDamage(), and Move().
+            introduce runtime polymorphism. In layman's terms, it is when a method that is commonly 
+            implemented in all members of a parent class is overridden in child classes. 
         </p>
         <p>
-            These seem straightforward enough and, at first, you might think this is the way to go. In
-            fact, I've made this exact mistake in the past. However, let's take a step back and think 
-            about what we are doing when we use inheritance.
+            To understand what that is supposed to mean, let us understand what inheritance is.
+        </p>
+
+        <h2>What is Inheritance?</h2>
+        <p>
+            Let's say we are creating a game with different types of enemies. Some enemies may move 
+            differently, others will have a different amount of HP, and some may have different attack 
+            patterns altogether. A naive approach would make to make a single script for each single 
+            enemy type like so:
+        </p>
+        <p>
+            <b>Insert image examples here</b>
+        </p>
+        <p>
+            However, as you can see in this example, there is a lot of code duplication. If we want 
+            to change the way enemies move, we would have to change it in every single script. Not 
+            only is this tedious, but it makes adding new enemies more difficult as well. What if 
+            there was a way to extract the common behaviors of each enemy type and put them in a 
+            base class that all enemies share?
+        </p>
+        <p> 
+            Well, let's do just that. Let's create a base class called Enemy. If each enemy shares 
+            the same Move() behavior, then we can add it to this Enemy class. Then, whenever we need 
+            to add a new enemy into the game, we can <i>extend</i> it from the base Enemy class like this:
+        </p>
+        <p>
+            <b>Insert image examples here</b>
+        </p>
+        <p>
+            What we effectively did is we made a parent class that defined overarching behavior that 
+            <i>all</i> enemies share, and then we create child classes that <i>inherit</i> from it. This 
+            is what inheritance means in programming. The child class inherits the behavior of the parent 
+            class, and can override it if it needs to.
+        </p>    
+        <p>
+            As you can imagine, this is a much better approach than the first one, because now we can
+            change the Move() behavior in one place, and it will affect all enemies. This is a much more 
+            scalable approach to programming, and is a common practice in game development.
+        </p>
+        <p class = "note">
+            Some experienced programmers may be questioning the scalability of this approach. Bear with
+            me here. I will discuss the flaws of inheritance later in this chapter.
+        </p>
+        <p>
+            But we have a small problem. What if we want an enemy that moves differently than the rest?
+            How can we make it so that we can make a unique Move() function for a child class of Enemy?
+            Well, this is where polymorphism comes in.
+        </p>
+        
+        <h2>Polymorphism</h2>
+        <p>
+            The core concept of polymorphism is this -- let the parent class define the methods that the
+            child class <i>must</i> inherit, but let the child class <i>override</i> the functionality
+            in the way they want to. For example, let's say we want an enemy to run away from the player
+            instead of chasing them. We can use polymorphism to use the same method signature, but give 
+            it different functionality:
+        </p>
+        <p>
+            This can unlock some pretty interesting functionality that can genuinely have beneficial side 
+            effects to your code. Since inhertance guarantees that any child object of a parent class 
+            will have some version of a method, we can leverage it to do something called dependency 
+            injection. 
+        </p>
+        <p>
+            <b>MENTION THAT THIS GUARANTEES METHODS ACROSS THE PARENT AND ITS CHILDRENs</b>
+        </p>
+        <p>
+            Dependency injection leverages polymorphism in a way that makes code more organized and easier
+            to bug-fix. However, to explain it in a way that makes sense to someone new to this concept, 
+            how about I open this with a new example besides enemies.
+        </p>
+        <p>
+            Let's say we are making a game where we want the player to be able to interact with multiple
+            kinds of objects. You may think that we can just have a bunch of switch statements to check
+            for the type of object like so:
+        </p>
+        <p>
+            <b>Insert image examples here</b>
+        </p>
+        <p>
+            But what if we have 10, 100, 1000 different objects all with their unique functionality and
+            behaviors? This easily becomes unscalable and annoying to deal with. My head hurts just thinking
+            about it. So what can we do?
+        </p>
+        <p>
+            Remember what I said earlier about inheritance. Inheritance guarantees that all child objects
+            will have a method. So, what we can do is that we can have each child class override an Interact()
+            method, and then we can attach these scripts to each object in the world:
+        </p>
+        <p>
+            <b>Insert image examples here</b>
+        </p>
+        <p>
+            Instead of putting unnecessary bug-prone functionality inside of the player's interaction script, we
+            isolated the interaction logic in individual scripts attached to each object. This means that the
+            player's interaction script will work with any object no matter what <i>as long as it inherits from
+            that class.</i> So, what would have been hundreds to thousands of lines of code in a single script 
+            now has become divided into separate files, making organization and isolated bug-fixing much easier.
+        </p>
+        <p>
+            This is what dependency injection is. We force our main script to <i>depend</i> on a specific category 
+            of objects that <i>inject</i> their functionality into the code.
         </p>
 
         <h2>The Problem With Inheritance</h2>
         <p>
-            What happens if we have a hundred different types of enemies, and some of them have exceptions 
-            to these rules? Maybe some enemies are invincible and can't take damage. Maybe some of them 
-            don't attack or even move, and are much more stationary with contact damage. How will we 
-            handle exceptions to the rules that we established? <b>This is the pitfall of inheritance; 
-            you are signing a contract that forces every single child class to follow the same principles.</b>
+            As mentioned in an aside, some of you here may have found or have already been made aware of the flaws
+            of inheritance. However, to those still unaware, it's okay! I made the same mistake when I first learned
+            about inheritance in college. That's the purpose of this website after all. However, I do not want
+            you to take away the notion that inheritance sucks. Realistically, it takes knowledge and experience
+            to know when to use inheritance and when not to use it. Hopefully, this section can explain that clearly.
+            If not, you can always open an issue on GitHub!
+        </p>
+        <p>
+            One of the biggest flaws that come with inheritance is the idea of "guaranteeing" code. In between
+            the twists and turns that come with game development and software engineering as a whole, many
+            things are rarely guaranteed to stay the same. Plans change, code needs to be refactored, and
+            what you thought would remain the same actually has to be reworked. Due to nature of inheritance,
+            if you change the parent class in any way, every child class will be affected.
+        </p>
+        <p>
+            For example, what happens if we have a hundred different types of enemies, and we decide that some
+            enemies are unable to move at all? What if you made it where every enemy has an HP variable, but you 
+            want an enemy that cannot take damage? Maybe some of them don't even attack the player. How will we 
+            handle exceptions to the rules that we established? Sure, we can check for the specific type an object is, 
+            but that risks entering the switch statement purgatory that was described previously. <b>This is the 
+            pitfall of inheritance; you are signing a contract that forces every single child class to follow the 
+            same principles.</b>
+        </p>
+        <p>
+            However, dependency injection is still an incredibly useful pattern for object-oriented programming. So,
+            how do we limit the number of contracts that we sign while still maintaining flexibility in the game design
+            process?
+        </p>
+        <p>
+            Well, say hello to composition.
+        </p>
+        <p class = "note">
+            This page is currently unfinished. Anything below this point will be changed soon.
         </p>
 
         <h2>Composition as an Alternative</h2>
@@ -41,12 +166,7 @@
             in the future.
         </p>
         <p>
-
-        </p>
-        <h2>In A Practical Scenario</h2>
-
-        <p>
-            WIP
+            <b>Insert image examples here</b>
         </p>
 
         <h2>Conclusion</h2>
