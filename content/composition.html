@@ -10,14 +10,6 @@
 <body>
     <div class="page">
         <h1>Composition vs Inheritance</h1>
-        <p>
-            Throughout my time in studying for my major, inheritance is commonly taught as a way to 
-            introduce runtime polymorphism. In layman's terms, it is when a method that is commonly 
-            implemented in all members of a parent class is overridden in child classes. 
-        </p>
-        <p>
-            To understand what that is supposed to mean, let us understand what inheritance is.
-        </p>
 
         <h2>What is Inheritance?</h2>
         <p>
@@ -68,24 +60,28 @@
         <h2>Polymorphism</h2>
         <p>
             The core concept of polymorphism is this -- let the parent class define the methods that the
-            child class <i>must</i> inherit, but let the child class <i>override</i> the functionality
+            child class inherits, but allow the child class to <i>override</i> the functionality
             in the way they want to. For example, let's say we want an enemy to run away from the player
             instead of chasing them. We can use polymorphism to use the same method signature, but give 
             it different functionality:
         </p>
         <p>
+            <b>Insert image examples here</b>
+        </p>
+        <p class = "note">
+            The child class of a parent does not actually need to override a method for it to implement
+            and use it. If a child does not override the parent method, it will simply inherit the
+            functionality of the parent method. 
+            <br>
+            <br>
+            There are ways to write the parent class that forces any child classes to override a specific
+            method (namely abstract methods), but I do not wish to overload you with additional information.
+        </p>
+        <p>
             This can unlock some pretty interesting functionality that can genuinely have beneficial side 
-            effects to your code. Since inhertance guarantees that any child object of a parent class 
-            will have some version of a method, we can leverage it to do something called dependency 
-            injection. 
-        </p>
-        <p>
-            <b>MENTION THAT THIS GUARANTEES METHODS ACROSS THE PARENT AND ITS CHILDRENs</b>
-        </p>
-        <p>
-            Dependency injection leverages polymorphism in a way that makes code more organized and easier
-            to bug-fix. However, to explain it in a way that makes sense to someone new to this concept, 
-            how about I open this with a new example besides enemies.
+            effects to your code. Since a child object inherits the members defined by its parent, it guarantees 
+            that it will have access to the parent's methods. Therefore, we can leverage this fact to 
+            make our code adaptable.
         </p>
         <p>
             Let's say we are making a game where we want the player to be able to interact with multiple
@@ -115,10 +111,6 @@
             that class.</i> So, what would have been hundreds to thousands of lines of code in a single script 
             now has become divided into separate files, making organization and isolated bug-fixing much easier.
         </p>
-        <p>
-            This is what dependency injection is. We force our main script to <i>depend</i> on a specific category 
-            of objects that <i>inject</i> their functionality into the code.
-        </p>
 
         <h2>The Problem With Inheritance</h2>
         <p>
@@ -130,11 +122,12 @@
             If not, you can always open an issue on GitHub!
         </p>
         <p>
-            One of the biggest flaws that come with inheritance is the idea of "guaranteeing" code. In between
-            the twists and turns that come with game development and software engineering as a whole, many
-            things are rarely guaranteed to stay the same. Plans change, code needs to be refactored, and
-            what you thought would remain the same actually has to be reworked. Due to nature of inheritance,
-            if you change the parent class in any way, every child class will be affected.
+            One of the biggest flaws that come with inheritance is the contract signed between a parent class and
+            its children. In between the twists and turns that come with game development and software engineering 
+            as a whole, many things are rarely guaranteed to stay the same. Plans change, code needs to be refactored, 
+            and what you thought would remain the same actually has to be reworked. Due to nature of inheritance,
+            if you change the parent class in any way, it is possible that many of the child classes will 
+            be affected. This can easily be a nightmare to refactor depending on how large the game is.
         </p>
         <p>
             For example, what happens if we have a hundred different types of enemies, and we decide that some
@@ -146,9 +139,8 @@
             same principles.</b>
         </p>
         <p>
-            However, dependency injection is still an incredibly useful pattern for object-oriented programming. So,
-            how do we limit the number of contracts that we sign while still maintaining flexibility in the game design
-            process?
+            So, how do we limit the number of contracts that we sign while still maintaining flexibility in the 
+            game design process?
         </p>
         <p>
             Well, say hello to composition.
