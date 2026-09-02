@@ -4,6 +4,7 @@
 
 <head>
     <link rel="stylesheet" href="../styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
     <title>Composition vs Inheritance</title>
 </head>
 
@@ -18,9 +19,51 @@
             patterns altogether. A naive approach would make to make a single script for each single 
             enemy type like so:
         </p>
-        <p>
-            <b>Insert image examples here</b>
-        </p>
+        
+<pre>
+<code class="language-csharp">
+    public class EnemyType1 : MonoBehaviour
+    {
+        void Attack()
+        {
+            // Slash
+        }
+        void Move()
+        {
+            // Move in a straight line
+        }
+    }
+    
+    public class EnemyType2 : MonoBehaviour
+    {
+        void Attack()
+        {
+            // Slash
+        }
+        void Move()
+        {
+            // Move in a zig-zag pattern
+        }
+    }
+
+    public class EnemyType3 : MonoBehaviour
+    {
+        void Attack()
+        {
+            // Slash
+        }
+        void Move()
+        {
+            // Move in a straight line
+        }
+        void SpecialAttack()
+        {
+            // Shoot a fireball
+        }
+    }
+</code>
+</pre>
+
         <p>
             However, as you can see in this example, there is a lot of code duplication. If we want 
             to change the way enemies move, we would have to change it in every single script. Not 
@@ -33,9 +76,33 @@
             the same Move() behavior, then we can add it to this Enemy class. Then, whenever we need 
             to add a new enemy into the game, we can <i>extend</i> it from the base Enemy class like this:
         </p>
-        <p>
-            <b>Insert image examples here</b>
-        </p>
+
+<pre>
+<code class="language-csharp">
+
+    public class Enemy : MonoBehaviour
+    {
+        void Attack()
+        {
+            // Slash
+        }
+        void Move()
+        {
+            // Move in a straight line
+        }
+    }
+
+    public class EnemyType1 : Enemy
+    {
+        // Inherits Attack() and Move() from Enemy
+    }
+
+    // EnemyType2 and EnemyType3 are hidden for this example, 
+    // but they also inherit Attack() and Move() from Enemy
+
+</code>
+</pre>
+
         <p>
             What we effectively did is we made a parent class that defined overarching behavior that 
             <i>all</i> enemies share, and then we create child classes that <i>inherit</i> from it. This 
@@ -65,9 +132,29 @@
             instead of chasing them. We can use polymorphism to use the same method signature, but give 
             it different functionality:
         </p>
-        <p>
-            <b>Insert image examples here</b>
-        </p>
+
+<pre>
+<code class="language-csharp">
+
+    public class EnemyType2 : Enemy
+    {
+        void override Move()
+        {
+            // Move in a zig-zag pattern
+        }
+    }
+
+    public class EnemyType3 : Enemy
+    {
+        void SpecialAttack()
+        {
+            // Shoot a fireball
+        }
+    }
+    
+</code>
+</pre>
+
         <p class = "note">
             The child class of a parent does not actually need to override a method for it to implement
             and use it. If a child does not override the parent method, it will simply inherit the
@@ -88,9 +175,32 @@
             kinds of objects. You may think that we can just have a bunch of switch statements to check
             for the type of object like so:
         </p>
-        <p>
-            <b>Insert image examples here</b>
-        </p>
+
+<pre>
+<code class="language-csharp">
+
+    public class PlayerInteraction : MonoBehaviour
+    {
+        void Interact(GameObject obj)
+        {
+            switch(obj.GetType())
+            {
+                case Door:
+                    // Do something
+                    break;
+                case NPC:
+                    // Do something else
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+        }
+    }
+    
+</code>
+</pre>
+
         <p>
             But what if we have 10, 100, 1000 different objects all with their unique functionality and
             behaviors? This easily becomes unscalable and annoying to deal with. My head hurts just thinking
@@ -101,9 +211,45 @@
             will have a method. So, what we can do is that we can have each child class override an Interact()
             method, and then we can attach these scripts to each object in the world:
         </p>
-        <p>
-            <b>Insert image examples here</b>
-        </p>
+
+<pre>
+<code class="language-csharp">
+
+    public class PlayerInteraction : MonoBehaviour
+    {
+        void Interact(GameObject obj)
+        {
+            obj.Interact();
+        }
+    }
+
+    public class Interactable : MonoBehaviour
+    {
+        virtual void Interact()
+        {
+            // Do nothing
+        }
+    }
+
+    public class Door : Interactable
+    {
+        void Interact()
+        {
+            // Open the door
+        }
+    }
+    
+    public class NPC : Interactable
+    {
+        void Interact()
+        {
+            // Talk to the NPC
+        }
+    }
+    
+</code>
+</pre>
+
         <p>
             Instead of putting unnecessary bug-prone functionality inside of the player's interaction script, we
             isolated the interaction logic in individual scripts attached to each object. This means that the
@@ -145,20 +291,67 @@
         <p>
             Well, say hello to composition.
         </p>
-        <p class = "note">
-            This page is currently unfinished. Anything below this point will be changed soon.
-        </p>
 
         <h2>Composition as an Alternative</h2>
         <p>
             So what makes composition so special? Well, what if instead of having multiple classes and 
             subclasses to handle variations of an enemy, we create separate objects such as MoveSystem, 
             AttackSystem, and HPSystem. That way, we can pick and choose whether an enemy includes these 
-            systems, removing the contract that inheritance forces upon it, embracing potential changes 
-            in the future.
+            systems.
         </p>
         <p>
-            <b>Insert image examples here</b>
+            For example, let's say we have an enemy that cannot move, but they can attack the player. What this
+            would look like is that we would create an Enemy class that has three variables, one for each system. 
+            Then, we can create interfaces for each type of system and set each of these variables to these types
+            like so:
+        </p>
+
+<pre>
+<code class="language-csharp">
+
+    public class Enemy : MonoBehaviour
+    {
+        public IMoveSystem moveSystem;
+        public IAttackSystem attackSystem;
+        public IHPSystem hpSystem;
+
+        void Update()
+        {
+            if (moveSystem != null)
+                moveSystem.Move();
+            
+            if (attackSystem != null)
+                attackSystem.Attack();
+
+            if (hpSystem != null)
+                hpSystem.TakeDamage();  
+        }
+    }
+    
+</code>
+</pre>
+
+        <p>
+            Now, whenever we want to create a new kind of movement system, we can create a new class that implements
+            the proper interface. This allows us to create a new movement system that can be used by any enemy. The
+            best part about this design is that we have a "handler" script and a "dependency" script. The handler script
+            (i.e. Enemy) is the one that uses the dependency script (i.e. MoveSystem). This means that we can change the 
+            dependency script without affecting the handler script, and we can reuse these scripts across enemies.
+        </p>
+        <p>
+            The concept of inserting a dependency into a handler script through external means, such as a manager or 
+            through Unity's inspector window, is called <b>Dependency Injection</b>. This is a very common design pattern in 
+            software engineering, and it is used to make code more flexible and reusable. I'd definitely recommend looking
+            into it if you are interested in learning more about software engineering and design patterns.
+        </p>
+        <p class = "note">
+            But wait, what's the difference between using an interface instead of a class?
+            <br>
+            <br>
+            Well, functionally, they're the same. However, an interface is a contract that defines a set of methods that 
+            a class must implement, but does not create a hierarchy like a class does. This means that a class can implement
+            muliple interfaces without being forced to inherit from a single parent class. This is a very useful feature that
+            allows for more flexibility in code design.
         </p>
 
         <h2>Conclusion</h2>
@@ -168,8 +361,11 @@
             line of code to work for several different types of objects, like one Drive() function call that 
             works for all types of Car types. However, whenever you use inheritance, keep in mind the contract 
             you are making. Like all things, use your knowledge with purpose.
+            
         </p>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
 </body>
 
 </html>
