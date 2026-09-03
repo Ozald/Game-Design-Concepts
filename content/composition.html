@@ -5,109 +5,115 @@
 <head>
     <link rel="stylesheet" href="../styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
-    <title>Composition vs Inheritance</title>
+    <title>Inheritance & Composition</title>
 </head>
 
 <body>
     <div class="page">
-        <h1>Composition vs Inheritance</h1>
+        <h1>Inheritance & Composition</h1>
 
         <h2>What is Inheritance?</h2>
         <p>
-            Let's say we are creating a game with different types of enemies. Some enemies may move 
-            differently, others will have a different amount of HP, and some may have different attack 
-            patterns altogether. A naive approach would be to make a single script for each single 
-            enemy type like so:
+            Let's say we are creating an RPG game with different types of enemies. Some enemies may move 
+            differently, and some enemies currently have special attacks. However, they share some common 
+            behaviors, such as their base attacks. A naive approach would be to make a single script for 
+            each single enemy type and copy and paste the code like so:
         </p>
         
 <pre>
 <code class="language-csharp">
-    public class EnemyType1 : MonoBehaviour
+public class Knight : MonoBehaviour
+{
+    void Attack()
     {
-        void Attack()
-        {
-            // Slash
-        }
-        void Move()
-        {
-            // Move in a straight line
-        }
+        // Slash
     }
-    
-    public class EnemyType2 : MonoBehaviour
+    void Move()
     {
-        void Attack()
-        {
-            // Slash
-        }
-        void Move()
-        {
-            // Move in a zig-zag pattern
-        }
+        // Move in a straight line
     }
+}
 
-    public class EnemyType3 : MonoBehaviour
+public class Assassin : MonoBehaviour
+{
+    void Attack()
     {
-        void Attack()
-        {
-            // Slash
-        }
-        void Move()
-        {
-            // Move in a straight line
-        }
-        void SpecialAttack()
-        {
-            // Shoot a fireball
-        }
+        // Slash
     }
+    void Move()
+    {
+        // Move in a zig-zag pattern
+    }
+}
+
+public class Mage : MonoBehaviour
+{
+    void Attack()
+    {
+        // Slash
+    }
+    void Move()
+    {
+        // Move in a straight line
+    }
+    void SpecialAttack()
+    {
+        // Shoot a fireball
+    }
+}
+
+//...
 </code>
 </pre>
 
         <p>
-            However, as you can see in this example, there is a lot of code duplication. If we want 
-            to change the way enemies move, we would have to change it in every single script. Not 
-            only is this tedious, but it makes adding new enemies more difficult as well. What if 
-            there was a way to extract the common behaviors of each enemy type and put them in a 
+            As you can see in this example, there is a lot of code duplication. The Attack() methods 
+            are duplicated across all enemy types, and the Move() method is also duplicated across 
+            the Knight and the Mage. If we want to change the way all enemies attacked, we would have 
+            to change it in each and every single script. For example, if we want to change how all
+            enemies attack, we would have to change it in the Knight, Assassin, and Mage scripts. Not 
+            only is this tedious, but it makes adding new enemies more difficult as well. A new enemy
+            would require a new script written from scratch, and we would have to copy and paste the
+            code from one of the existing scripts. For small projects, this may be okay, but as projects
+            grow larger, this becomes unscalable and difficult to maintain.
+        </p>
+        <p>
+            What if there was a way to extract the common behaviors of each enemy type and put them in a 
             base class that all enemies share?
         </p>
         <p> 
-            Well, let's do just that. Let's create a base class called Enemy. If each enemy shares 
-            the same Move() behavior, then we can add it to this Enemy class. Then, whenever we need 
-            to add a new enemy into the game, we can <i>extend</i> it from the base Enemy class like this:
+            Well, let's do just that. Let's create a base class called Enemy. In our example, each enemy 
+            will have the same Attack() and Move() methods, so we can put those in the base class. Now that
+            we have our base class, we can now <i>extend</i> from that class to create new subtypes of enemies.
+            For example, let's recreate the Knight class:
         </p>
 
 <pre>
 <code class="language-csharp">
-
-    public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour
+{
+    void Attack()
     {
-        void Attack()
-        {
-            // Slash
-        }
-        void Move()
-        {
-            // Move in a straight line
-        }
+        // Slash
     }
-
-    public class EnemyType1 : Enemy
+    void Move()
     {
-        // Inherits Attack() and Move() from Enemy
+        // Move in a straight line
     }
+}
 
-    // EnemyType2 and EnemyType3 are hidden for this example, 
-    // but they also inherit Attack() and Move() from Enemy
-
+public class Knight : Enemy
+{
+    // Inherits Attack() and Move() from Enemy
+}
 </code>
 </pre>
 
         <p>
             What we effectively did is we made a parent class that defined overarching behavior that 
-            <i>all</i> enemies share, and then we create child classes that <i>inherit</i> from it. This 
+            <i>all</i> enemies share, and then we create child classes that <i>inherit</i> from it. <b>This 
             is what inheritance means in programming. The child class inherits the behavior of the parent 
-            class, and can override it if it needs to.
+            class, and can add new functionality if it needs to.</b>
         </p>    
         <p>
             As you can imagine, this is a much better approach than the first one, because now we can
@@ -119,44 +125,33 @@
             me here. I will discuss the flaws of inheritance later in this chapter.
         </p>
         <p>
-            But we have a small problem. What if we want an enemy that moves differently than the rest?
-            How can we make it so that we can make a unique Move() function for a child class of Enemy?
-            Well, this is where polymorphism comes in.
+            But we have a small problem. Our Assassin class previously had a unique Move() function in
+            which it moved in a different way than other enemies. What do we do if we want to change the 
+            functionality of a specific method in a child class? Well, this is where polymorphism comes in.
         </p>
         
-        <h2>Polymorphism</h2>
+        <h2>Runtime Polymorphism</h2>
         <p>
-            The core concept of polymorphism is this -- let the parent class define the methods that the
-            child class inherits, but allow the child class to <i>override</i> the functionality
-            in the way they want to. For example, let's say we want an enemy to run away from the player
-            instead of chasing them. We can use polymorphism to use the same method signature, but give 
-            it different functionality:
+            The core concept of runtime polymorphism is this -- let the parent class define the methods that the
+            child class inherits, but allow the child class to <i>override</i> the functionality in the 
+            way they want to. For example, let's say we want an enemy to move in a zig-zag pattern. We can 
+            use runtime polymorphism to use the same method signature, but give it different functionality:
         </p>
 
 <pre>
 <code class="language-csharp">
-
-    public class EnemyType2 : Enemy
+public class Assassin : Enemy
+{
+    override void Move()
     {
-        void override Move()
-        {
-            // Move in a zig-zag pattern
-        }
+        // Move in a zig-zag pattern
     }
-
-    public class EnemyType3 : Enemy
-    {
-        void SpecialAttack()
-        {
-            // Shoot a fireball
-        }
-    }
-    
+}
 </code>
 </pre>
 
         <p class = "note">
-            The child class of a parent does not actually need to override a method for it to implement
+            The child class of a parent does not need to override a method for it to implement
             and use it. If a child does not override the parent method, it will simply inherit the
             functionality of the parent method. 
             <br>
@@ -165,10 +160,26 @@
             method (namely abstract methods), but I do not wish to overload you with additional information.
         </p>
         <p>
-            This can unlock some pretty interesting functionality that can genuinely have beneficial side 
-            effects to your code. Since a child object inherits the members defined by its parent, it guarantees 
-            that it will have access to the parent's methods. Therefore, we can leverage this fact to 
-            make our code adaptable.
+            This can unlock some pretty interesting properties that can genuinely have beneficial side 
+            effects to your code. For example, since the child class inherits the parent class, it is 
+            guaranteed to have access to the parent's methods. As a result, no matter what type of child
+            class you have, you can call the same method on it and it will work. 
+        </p>
+<pre>
+<code class="language-csharp">
+Enemy enemyA = new Assassin();
+enemyA.Move();       // Calls the overridden Move() method in Assassin
+
+Enemy enemyB = new Knight();
+enemyB.Move();       // Calls the Move() method in Knight (inherited from Enemy)
+</code>
+</pre>
+        <p>
+            This is an example of runtime polymorphism, where the method that is called is determined at runtime 
+            based on the type of object that is being referenced. This allows for more flexible and reusable code, 
+            as you can write code that works with any type of object that inherits from a common parent class.
+            This property applies to abstract classes and interfaces as well, which is why they are so useful 
+            in programming. Here is how we can leverage runtime polymorphism to make our code more flexible and reusable.
         </p>
         <p>
             Let's say we are making a game where we want the player to be able to interact with multiple
@@ -178,91 +189,102 @@
 
 <pre>
 <code class="language-csharp">
-
-    public class PlayerInteraction : MonoBehaviour
+public class PlayerInteraction : MonoBehaviour
+{
+    void Interact(GameObject obj)
     {
-        void Interact(GameObject obj)
+        switch(obj.GetType())
         {
-            switch(obj.GetType())
-            {
-                case Door:
-                    // Do something
-                    break;
-                case NPC:
-                    // Do something else
-                    break;
-                default:
-                    // Do nothing
-                    break;
-            }
+            case Door:
+                // Do something
+                break;
+            case Chest:
+                // Do something
+                break;
+            case Button:
+                // Do something
+                break;
+            case NPC:
+                // Do something else
+                break;
+            default:
+                // Do nothing
+                break;
         }
     }
-    
+}   
 </code>
 </pre>
 
         <p>
-            But what if we have 10, 100, 1000 different objects all with their unique functionality and
-            behaviors? This easily becomes unscalable and annoying to deal with. My head hurts just thinking
-            about it. So what can we do?
+            But what if we have 10, 100, 1000 different objects, each with their unique functionality and
+            behaviors? This easily becomes unscalable and annoying to deal with. Can you imagine how many
+            lines of code you would need in a <i>single script?</i> It's a maintainance nightmare ready to
+            happen. So, how do we solve this problem? Well, we can use runtime polymorphism to our advantage.
         </p>
         <p>
-            Remember what I said earlier about inheritance. Inheritance guarantees that all child objects
-            will have a method. So, what we can do is that we can have each child class override an Interact()
-            method, and then we can attach these scripts to each object in the world:
+            Remember what I said earlier about inheritance? The child class inherits all methods of the parent 
+            class. So, what we can do is that we can have each child class override an Interact() method, and 
+            then we can attach these scripts to each object in the world:
         </p>
 
 <pre>
 <code class="language-csharp">
+public class PlayerInteraction : MonoBehaviour
+{
+    void Interact(Interactable obj)
+    {
+        obj.Interact();
+    }
+}
 
-    public class PlayerInteraction : MonoBehaviour
+public class Interactable : MonoBehaviour
+{
+    virtual void Interact()
     {
-        void Interact(GameObject obj)
-        {
-            obj.Interact();
-        }
+        Debug.Log("Interacted with an object");
     }
+}
 
-    public class Interactable : MonoBehaviour
+public class Door : Interactable
+{
+    void Interact()
     {
-        virtual void Interact()
-        {
-            // Do nothing
-        }
+        // Open the door
     }
+}
 
-    public class Door : Interactable
+public class NPC : Interactable
+{
+    void Interact()
     {
-        void Interact()
-        {
-            // Open the door
-        }
+        // Talk to the NPC
     }
-    
-    public class NPC : Interactable
-    {
-        void Interact()
-        {
-            // Talk to the NPC
-        }
-    }
-    
+}
+
+//...
 </code>
 </pre>
-
         <p>
-            Instead of putting unnecessary bug-prone functionality inside of the player's interaction script, we
-            isolated the interaction logic in individual scripts attached to each object. This means that the
-            player's interaction script will work with any object no matter what <i>as long as it inherits from
-            that class.</i> So, what would have been hundreds to thousands of lines of code in a single script 
-            now has become divided into separate files, making organization and isolated bug-fixing much easier.
+            This example is exactly the same to what we did with the enemies earlier. Since the Door and NPC classes
+            inherit from the Interactable class, the compiler knows that they have an Interact() method. So, all we 
+            need to do is pass in the object that the player isinteracting with, such as through a collision or a key 
+            press. This means that we can call the Interact() method on the Interactable object, and the correct method 
+            will be called based on the type of object that is being referenced. 
+        </p>
+        <p>
+            Additionally, instead of putting unnecessary bug-prone functionality inside of the player's interaction script, 
+            we isolated the interaction logic in individual classes attached to each object that we can place into different 
+            scripts. This means that the player's interaction script will work with any object no matter what <i>as long as 
+            it inherits from Interactable</i> So, what would have been hundreds to thousands of lines of code in a single 
+            script now has become divided into separate files, making organization and isolated bug-fixing much easier.
         </p>
 
         <h2>The Problem With Inheritance</h2>
         <p>
             As mentioned in an aside, some of you here may have found or have already been made aware of the flaws
             of inheritance. However, to those still unaware, it's okay! I made the same mistake when I first learned
-            about inheritance in college. That's the purpose of this website after all. However, I do not want
+            about inheritance in the first place. That's the purpose of this website after all. However, I do not want
             you to take away the notion that inheritance sucks. Realistically, it takes knowledge and experience
             to know when to use inheritance and when not to use it. Hopefully, this section can explain that clearly.
             If not, you can always open an issue on GitHub!
@@ -308,26 +330,24 @@
 
 <pre>
 <code class="language-csharp">
+public class Enemy : MonoBehaviour
+{
+    public IMoveSystem moveSystem;
+    public IAttackSystem attackSystem;
+    public IHPSystem hpSystem;
 
-    public class Enemy : MonoBehaviour
+    void Update()
     {
-        public IMoveSystem moveSystem;
-        public IAttackSystem attackSystem;
-        public IHPSystem hpSystem;
+        if (moveSystem != null)
+            moveSystem.Move();
+        
+        if (attackSystem != null)
+            attackSystem.Attack();
 
-        void Update()
-        {
-            if (moveSystem != null)
-                moveSystem.Move();
-            
-            if (attackSystem != null)
-                attackSystem.Attack();
-
-            if (hpSystem != null)
-                hpSystem.TakeDamage();  
-        }
+        if (hpSystem != null)
+            hpSystem.TakeDamage();  
     }
-    
+}
 </code>
 </pre>
 
@@ -336,7 +356,9 @@
             the proper interface. This allows us to create a new movement system that can be used by any enemy. The
             best part about this design is that we have a "handler" script and a "dependency" script. The handler script
             (i.e. Enemy) is the one that uses the dependency script (i.e. MoveSystem). This means that we can change the 
-            dependency script without affecting the handler script, and we can reuse these scripts across enemies.
+            dependency script without affecting the handler script, and we can reuse these scripts across enemies. I
+            personally like to think of this as a "plug-and-play" system, where we can plug in different systems to 
+            create different behaviors altogether.
         </p>
         <p>
             The concept of inserting a dependency into a handler script through external means, such as a manager or 
@@ -350,19 +372,27 @@
             <br>
             Well, functionally, they're the same. However, an interface is a contract that defines a set of methods that 
             a class must implement, but does not create a hierarchy like a class does. This means that a class can implement
-            muliple interfaces without being forced to inherit from a single parent class. This is a very useful feature that
+            multiple interfaces without being forced to inherit from a single parent class. This is a very useful feature that
             allows for more flexibility in code design.
+        </p>
+        <p>
+            Does this mean inheritance is completely useless? No, of course not! Sometimes, you want that contract to be made 
+            so that runtime polymorphism can be used. It is very much a handy feature, after all. Personally, I like to use 
+            interfaces instead of parent classes due to their flexibility, but at its core, it is the same concept as inheritance. 
+            No matter what you choose, though, make sure you know what you're doing, and that you are using the right tool for 
+            the job. Just because you have a hammer doesn't mean everything is a nail.
         </p>
 
         <h2>Conclusion</h2>
         <p>
-            Does this mean inheritance is completely useless? No, of course not! Sometimes, you want that 
-            contract to be made for polymorphism to be used. Polymorphism is very useful when you want one 
-            line of code to work for several different types of objects, like one Drive() function call that 
-            works for all types of Car types. However, whenever you use inheritance, keep in mind the contract 
-            you are making. Like all things, use your knowledge with purpose.
-            
+            Overall, both inheritance and composition have their pros and cons. For smaller systems, inheritance can be a good 
+            choice, but for larger, more complex systems, composition often provides more flexibility and maintainability at the cost 
+            of increased complexity and time to set up. Knowing when to use each approach is a key skill in software engineering and 
+            game development. Once you start thinking about game progrmaming not as a series of scripts, but as a series of systems 
+            that <i>you</i> need to maintain, your skill as a developer will grow exponentially. I hope this chapter has helped you 
+            understand the differences between inheritance and composition, and how to use them effectively in your own projects.
         </p>
+        
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
